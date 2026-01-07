@@ -39,8 +39,19 @@ function isInAppBrowser() {
 
 const App = () => {
   const { Kakao } = window;
-  Kakao.cleanup();
-  Kakao.init(import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY);
+  const kakaoKey = import.meta.env.VITE_KAKAO_JAVASCRIPT_KEY;
+
+  if (Kakao && kakaoKey) {
+    try {
+      Kakao.cleanup?.();
+      Kakao.init(kakaoKey);
+    } catch (e) {
+      console.warn("Kakao init failed:", e);
+    }
+  } else {
+    console.info("Kakao key not provided. Kakao login disabled.");
+  }
+
 
   const ios = isIOS();
   const wkwebview = isWKWebView();
