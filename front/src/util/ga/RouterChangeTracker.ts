@@ -7,10 +7,20 @@ const RouterChangeTracker = () => {
   const [initialized, setInitialized] = useState(false);
 
   useEffect(() => {
-    if (!window.location.href.includes("localhost")) {
-      ReactGA.initialize(import.meta.env.VITE_APP_GA_TRACKING_ID);
+    const gaId = import.meta.env.VITE_APP_GA_TRACKING_ID;
+
+    if (!window.location.href.includes("localhost") && gaId) {
+      try {
+        ReactGA.initialize(gaId);
+        setInitialized(true);
+      } catch (e) {
+        console.warn("GA init failed:", e);
+        setInitialized(false);
+      }
+    } else {
+      console.info("GA disabled (missing ID or localhost).");
+      setInitialized(false);
     }
-    setInitialized(true);
   }, []);
 
   useEffect(() => {
@@ -19,6 +29,8 @@ const RouterChangeTracker = () => {
       ReactGA.send("pageview");
     }
   }, [initialized, location]);
+
+  return null;
 };
 
 export default RouterChangeTracker;
